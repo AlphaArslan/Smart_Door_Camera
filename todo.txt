@@ -1,6 +1,4 @@
-- setup raspberry pi
-- test camera
-- test push button
+- build camera script
 - test mechanical lock
 - face recognition
 - webpage

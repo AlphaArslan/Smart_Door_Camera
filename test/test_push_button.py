@@ -8,6 +8,6 @@ import time
 
 pb = push_button.PushButton(config.BELL_PIN)
 
-while true:
+while True:
     print(pb.get_status())
     time.sleep(1)
