@@ -39,6 +39,48 @@
     <!-- navigation bar -->
 
 
+    <!-- users -->
+
+    <div class="card-columns">
+
+      {% for user in known_list %}
+          <div class="card bg-primary" >
+            <img src="static/known_ppl/{{user}}.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">{{user}}</h5>
+              <a href="/remove/known/{{user}}" class="btn btn-danger">Remove</a>
+            </div>
+          </div>
+      {% endfor %}
+    </div>
+
+    <div class="card-columns">
+
+      {% for user in unknown_list %}
+          <div class="card bg-warning" >
+            <img src="static/unknown_ppl/{{user}}.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">{{user}}</h5>
+
+            </div>
+            <form action="/add_user/{{user}}" method="post">
+              <label for="exampleFormControlTextarea1">Do you know this person ?</label>
+              <input type="text" name="name" placeholder="name"/>
+              <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+
+            <!-- <a href="/remove/{{user}}" class="btn btn-success">Add</a> -->
+            <a href="/remove/unknown/{{user}}" class="btn btn-danger">Remove</a>
+          </div>
+
+      {% endfor %}
+    </div>
+
+
+
+    <!-- users -->
+
+
 
   </body>
 </html>
