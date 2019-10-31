@@ -2,6 +2,8 @@
 from flask import Flask, render_template, redirect, request
 import glob
 import os
+import face_recognition
+import pickle
 
 ########################## setup
 app = Flask(__name__)
@@ -48,6 +50,23 @@ def remove(k, name):
         os.remove(known_path+name+'.jpg')
     elif k == 'unknown':
         os.remove(unknown_path+name+'.jpg')
+
+    print("proccessing known images encodings")
+    known_faces_encodings = []
+    known_faces = sorted(glob.glob(known_path+'*'))
+    for f in known_faces:
+        f_img = face_recognition.load_image_file(f)
+        try:
+            f_encoding =  face_recognition.face_encodings(f_img)[0]
+        except IndexError:
+            print("check known images. Aborting...")
+            quit()
+        known_faces_encodings.append(f_encoding)
+
+    print("saving encodings to file")
+    with open(known_path+"encodings.pickle", 'wb') as fp:
+        pickle.dump(known_faces_encodings, fp)
+
     return redirect('/users')
 
 
@@ -55,6 +74,23 @@ def remove(k, name):
 def add_user(old_name):
     name = request.form["name"]
     os.rename(unknown_path+old_name+'.jpg',known_path+name+'.jpg')
+
+    print("proccessing known images encodings")
+    known_faces_encodings = []
+    known_faces = sorted(glob.glob(known_path+'*'))
+    for f in known_faces:
+        f_img = face_recognition.load_image_file(f)
+        try:
+            f_encoding =  face_recognition.face_encodings(f_img)[0]
+        except IndexError:
+            print("check known images. Aborting...")
+            quit()
+        known_faces_encodings.append(f_encoding)
+
+    print("saving encodings to file")
+    with open(known_path+"encodings.pickle", 'wb') as fp:
+        pickle.dump(known_faces_encodings, fp)
+
     return redirect('/users')
 
 
