@@ -35,6 +35,9 @@ def log():
 def users():
     known_list = []
     for user in sorted(glob.glob(known_path + '*')):
+        # bypass pickle file
+        if user.split(".")[-1] == "pickle":
+            continue
         name = user.split(slash)[-1].split('.')[0]
         known_list.append(name)
     unknown_list = []
@@ -48,24 +51,26 @@ def users():
 def remove(k, name):
     if k == 'known':
         os.remove(known_path+name+'.jpg')
+        print("proccessing known images encodings")
+        known_faces_encodings = []
+        known_faces = sorted(glob.glob(known_path+'*'))
+        for f in known_faces:
+            # bypass pickle file
+            if f.split(".")[-1] == "pickle":
+                continue
+            f_img = face_recognition.load_image_file(f)
+            try:
+                f_encoding =  face_recognition.face_encodings(f_img)[0]
+            except IndexError:
+                print("check known images. Aborting...")
+                quit()
+            known_faces_encodings.append(f_encoding)
+        print("saving encodings to file")
+        with open(known_path+"encodings.pickle", 'wb') as fp:
+            pickle.dump(known_faces_encodings, fp)
+
     elif k == 'unknown':
         os.remove(unknown_path+name+'.jpg')
-
-    print("proccessing known images encodings")
-    known_faces_encodings = []
-    known_faces = sorted(glob.glob(known_path+'*'))
-    for f in known_faces:
-        f_img = face_recognition.load_image_file(f)
-        try:
-            f_encoding =  face_recognition.face_encodings(f_img)[0]
-        except IndexError:
-            print("check known images. Aborting...")
-            quit()
-        known_faces_encodings.append(f_encoding)
-
-    print("saving encodings to file")
-    with open(known_path+"encodings.pickle", 'wb') as fp:
-        pickle.dump(known_faces_encodings, fp)
 
     return redirect('/users')
 
@@ -79,6 +84,9 @@ def add_user(old_name):
     known_faces_encodings = []
     known_faces = sorted(glob.glob(known_path+'*'))
     for f in known_faces:
+        # bypass pickle file
+        if f.split(".")[-1] == "pickle":
+            continue
         f_img = face_recognition.load_image_file(f)
         try:
             f_encoding =  face_recognition.face_encodings(f_img)[0]

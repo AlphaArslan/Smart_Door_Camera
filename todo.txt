@@ -1,2 +1,4 @@
-- test main
+- fix relay
+- add Log
+- add voice commands
 - backend (log & stream)

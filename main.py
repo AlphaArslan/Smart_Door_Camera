@@ -98,4 +98,4 @@ if __name__ == '__main__':
             if config.DEBUG_MODE:
                 print("[LOOP] not allowed")
                 unknown_counter += 1
-            cv2.imwrite(unknown_path+"unknown{}.jpg".format(unknown_counter))
+            cv2.imwrite(unknown_path+"unknown{}.jpg".format(unknown_counter), img)

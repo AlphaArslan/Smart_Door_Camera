@@ -9,7 +9,7 @@ class PushButton():
         """
         Active High
         """
-        GPIO.setup(pin ,GPIO.IN, pull_up_down=GPIO.PUD_HIGH)
+        GPIO.setup(pin ,GPIO.IN, pull_up_down=GPIO.PUD_UP)
         self.pin = pin
         self.closed_status = 0
 
