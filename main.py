@@ -8,11 +8,13 @@ import cv2
 import config
 import push_button
 import pins
+import camera
+import relay
 
 ################### objects
 bell_obj = push_button.PushButton(config.BELL_PIN)
-cam_obj = Camera(0)
-lock_obj = pins.Output(config.LOCK_PIN)
+cam_obj = camera.Camera(0)
+lock_obj = relay.Relay(config.LOCK_PIN)
 
 ################### path
 slash = '\\'                # windows
@@ -24,11 +26,11 @@ unknown_path = "webpage" + slash + "static" + slash + "unknown_ppl" + slash
 ################### func
 def open_lock():
     # open
-    lock_obj.high()
+    lock_obj.on()
     # delay
     time.sleep(config.OPEN_LOCK_DELAY)
     # close
-    lock_obj.low()
+    lock_obj.off()
 
 ################### main
 if __name__ == '__main__':
@@ -37,19 +39,22 @@ if __name__ == '__main__':
 
 
     allowed = False
-    print("proccessing known images encodings")
+    print("[SETUP] proccessing known images encodings")
     known_faces_encodings = []
     known_faces = sorted(glob.glob(known_path+'*'))
     for f in known_faces:
+        # bypass pickle file
+        if f.split(".")[-1] == "pickle":
+            continue
         f_img = face_recognition.load_image_file(f)
         try:
             f_encoding =  face_recognition.face_encodings(f_img)[0]
         except IndexError:
-            print("check known images. Aborting...")
+            print("[SETUP] check known images. Aborting...")
             quit()
         known_faces_encodings.append(f_encoding)
 
-    print("saving encodings to file")
+    print("[SETUP] saving encodings to file")
     with open(known_path+"encodings.pickle", 'wb') as fp:
         pickle.dump(known_faces_encodings, fp)
 
@@ -58,7 +63,7 @@ if __name__ == '__main__':
         # wait for door bell
         if config.DEBUG_MODE:
             print("[LOOP] Waiting for bell ring ...")
-        while !bell_obj.is_pressed():
+        while not bell_obj.is_pressed():
             time.sleep(config.BELL_CHECK_DELAY)
 
         # take a pic
@@ -68,7 +73,7 @@ if __name__ == '__main__':
         try:
             img_encoding = face_recognition.face_encodings(img)[0]
         except IndexError:
-            print("camera can't see anyone")
+            print("[LOOP] camera can't see anyone")
             continue
 
         # check if allowed

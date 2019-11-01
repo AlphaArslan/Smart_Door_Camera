@@ -1,5 +1,2 @@
-- build camera script
-- backend
-- test mechanical lock
-- face recognition
-- webpage
+- test main
+- backend (log & stream)
