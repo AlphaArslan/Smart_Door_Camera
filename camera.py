@@ -1,5 +1,6 @@
 # microsoft live hd-3000 camera
 import cv2
+import config
 
 class Camera():
     def __init__(self, id):
@@ -11,7 +12,12 @@ class Camera():
     def get_image(self):
         ret, img = self.cam.read()
         if ret:
-            return img
+            if config.DEBUG_MODE:
+                print("[CAM] returned an image")
+            im_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            return im_rgb
+        if config.DEBUG_MODE:
+            print("[CAM] no image")
         return None
 
     def __del__(self):
