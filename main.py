@@ -4,6 +4,7 @@ import face_recognition
 import glob
 import pickle
 import cv2
+import zmq
 
 import config
 import push_button
@@ -15,6 +16,10 @@ import relay
 bell_obj = push_button.PushButton(config.BELL_PIN)
 cam_obj = camera.Camera(0)
 lock_obj = relay.Relay(config.LOCK_PIN)
+# socket
+context = zmq.Context()
+socket = context.socket(zmq.REQ)
+socket.connect("tcp://localhost:"+config.MEDIA_PORT)
 
 ################### path
 slash = '\\'                # windows
@@ -36,8 +41,6 @@ def open_lock():
 if __name__ == '__main__':
     # setup
     unknown_counter = len(glob.glob(unknown_path+'*'))
-
-
     allowed = False
     print("[SETUP] proccessing known images encodings")
     known_faces_encodings = []
@@ -74,6 +77,19 @@ if __name__ == '__main__':
             img_encoding = face_recognition.face_encodings(img)[0]
         except IndexError:
             print("[LOOP] camera can't see anyone")
+            # play voice
+            socket.send(config.MEDIA_CMD_STOP)
+            print(socket.recv())
+            # send play command
+            socket.send(config.MEDIA_CMD_PLAY)
+            print(socket.recv())
+            socket.send("voice\\cant_see.mp3".encode('utf-8'))
+            print(socket.recv())
+            # input("press any key to stop media")
+            time.sleep(1)
+            socket.send(config.MEDIA_CMD_STOP)
+            print(socket.recv())
+
             continue
 
         # check if allowed
@@ -91,11 +107,45 @@ if __name__ == '__main__':
         if allowed:
             if config.DEBUG_MODE:
                 print("[LOOP] allowed")
+
+            # play voice
+            socket.send(config.MEDIA_CMD_STOP)
+            print(socket.recv())
+            # send play command
+            socket.send(config.MEDIA_CMD_PLAY)
+            print(socket.recv())
+            socket.send("voice\\allowed.mp3".encode('utf-8'))
+            print(socket.recv())
+            # input("press any key to stop media")
+            time.sleep(1)
+            socket.send(config.MEDIA_CMD_STOP)
+            print(socket.recv())
+
+            # add to log
+
             open_lock()
             allowed = False
         # if not allowed add to unkown
         else:
             if config.DEBUG_MODE:
                 print("[LOOP] not allowed")
-                unknown_counter += 1
+            unknown_counter += 1
+
+            # play voice
+            socket.send(config.MEDIA_CMD_STOP)
+            print(socket.recv())
+            # send play command
+            socket.send(config.MEDIA_CMD_PLAY)
+            print(socket.recv())
+            socket.send("voice\\not_allowed.mp3".encode('utf-8'))
+            print(socket.recv())
+            # input("press any key to stop media")
+            time.sleep(1)
+            socket.send(config.MEDIA_CMD_STOP)
+            print(socket.recv())
+
+            # add to log
+
+            # send email
+
             cv2.imwrite(unknown_path+"unknown{}.jpg".format(unknown_counter), img)

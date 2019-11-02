@@ -1,4 +1,4 @@
+- email alarm for unknown
 - fix relay
 - add Log
-- add voice commands
 - backend (log & stream)
