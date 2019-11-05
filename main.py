@@ -83,7 +83,7 @@ if __name__ == '__main__':
             # send play command
             socket.send(config.MEDIA_CMD_PLAY)
             print(socket.recv())
-            socket.send("voice\\cant_see.mp3".encode('utf-8'))
+            socket.send("voice\\cant_see.m4a".encode('utf-8'))
             print(socket.recv())
             # input("press any key to stop media")
             time.sleep(1)
@@ -114,7 +114,7 @@ if __name__ == '__main__':
             # send play command
             socket.send(config.MEDIA_CMD_PLAY)
             print(socket.recv())
-            socket.send("voice\\allowed.mp3".encode('utf-8'))
+            socket.send("voice\\allowed.m4a".encode('utf-8'))
             print(socket.recv())
             # input("press any key to stop media")
             time.sleep(1)
@@ -137,7 +137,7 @@ if __name__ == '__main__':
             # send play command
             socket.send(config.MEDIA_CMD_PLAY)
             print(socket.recv())
-            socket.send("voice\\not_allowed.mp3".encode('utf-8'))
+            socket.send("voice\\not_allowed.m4a".encode('utf-8'))
             print(socket.recv())
             # input("press any key to stop media")
             time.sleep(1)
