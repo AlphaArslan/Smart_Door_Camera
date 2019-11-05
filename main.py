@@ -11,6 +11,7 @@ import push_button
 import pins
 import camera
 import relay
+import send_email
 
 ################### objects
 bell_obj = push_button.PushButton(config.BELL_PIN)
@@ -147,5 +148,6 @@ if __name__ == '__main__':
             # add to log
 
             # send email
-
+            send_email.send_default_msg()
+            
             cv2.imwrite(unknown_path+"unknown{}.jpg".format(unknown_counter), img)
