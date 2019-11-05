@@ -1,6 +1,3 @@
-<head>
-
-</head>
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -44,17 +41,30 @@
 
 
     <!-- stream box -->
-    <!-- 16:9 aspect ratio -->
-    <div class="embed-responsive embed-responsive-16by9 z-depth-1-half w-75 mx-auto px-md-5">
-      <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/bk90kS-sB3Q?list=RDMMbk90kS-sB3Q" allowfullscreen></iframe>
-    </div>
+    <img src="static/img/stream.jpg" class=" col-md-8 img-fluid rounded mx-auto d-block" alt="Responsive image">
     <!-- stream box -->
 
+    <br><br>
     <!-- buttons -->
-    <div class="text-center mt-3">
-      <a class="btn btn-success btn-lg btn-lg mr-3" href="#" role="button">Open</a>
-      <a class="btn btn-danger btn-lg btn-lg ml-3" href="#" role="button">Lock</a>
-    </div>
+
+        <!-- controls -->
+          <div class="col-md-12 text-center">
+            <button type="button" style="width:40%" class="btn btn-success btn-lg mx-auto" onclick="open_door()">Open</button>
+            <br>
+          </div>
+
+          <script>
+          var xmlhttp;
+          xmlhttp=new XMLHttpRequest();
+          function open_door()
+          {
+          	xmlhttp.open("GET","/controls/open",true);
+          	xmlhttp.send();
+            alert("Opened");
+          }
+          </script>
+        <!-- controls -->
+
     <!-- buttons -->
 
 
