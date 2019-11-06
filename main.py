@@ -5,6 +5,7 @@ import glob
 import pickle
 import cv2
 import zmq
+from datetime import datetime
 
 import config
 import push_button
@@ -28,6 +29,8 @@ slash = '\\'                # windows
 
 known_path = "webpage" + slash + "static" + slash + "known_ppl" + slash
 unknown_path = "webpage" + slash + "static" + slash + "unknown_ppl" + slash
+stream_jpg = unknown_path = "webpage" + slash + "static" + slash + "img" + slash + "stream.jpg"
+log_txt = "webpage" + slash + "static" + slash + "log.txt"
 
 ################### func
 def open_lock():
@@ -37,6 +40,10 @@ def open_lock():
     time.sleep(config.OPEN_LOCK_DELAY)
     # close
     lock_obj.off()
+
+def get_name_no_ext(str):
+    name = str.split(slash).split(".")[0]
+    return name
 
 ################### main
 if __name__ == '__main__':
@@ -99,10 +106,12 @@ if __name__ == '__main__':
         with open (known_path+"encodings.pickle", 'rb') as fp:
             known_faces_encodings = pickle.load(fp)
         results = face_recognition.compare_faces(known_faces_encodings, img_encoding)
+        i = 0
         for r in results:
             if r :
                 allowed = True
                 break
+            i += 1
 
         # if allowed open
         if allowed:
@@ -123,7 +132,15 @@ if __name__ == '__main__':
             print(socket.recv())
 
             # add to log
+            name = get_name_no_ext(known_faces[i])
+            now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            txt = "Allowed {} at {}".format(name, now)
+            if config.DEBUG_MODE:
+                print("[LOG] {}".format(txt))
+            with open(log_txt, "w+") as log :
+                log.append("{}\n".format(txt))
 
+            # open lock
             open_lock()
             allowed = False
         # if not allowed add to unkown
@@ -146,8 +163,18 @@ if __name__ == '__main__':
             print(socket.recv())
 
             # add to log
+            name = "unknown{}".format(unknown_counter)
+            now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            txt = "Rejected {} at {}".format(name, now)
+            if config.DEBUG_MODE:
+                print("[LOG] {}".format(txt))
+            with open(log_txt, "w+") as log :
+                log.append("{}\n".format(txt))
 
             # send email
             send_email.send_default_msg()
-            
+
+            # save image
             cv2.imwrite(unknown_path+"unknown{}.jpg".format(unknown_counter), img)
+            # update stream.jpg
+            cv2.imwrite(stream_jpg, img)

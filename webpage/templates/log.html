@@ -39,7 +39,20 @@
     </nav>
     <!-- navigation bar -->
 
+    <!-- log -->
+    <ul class="list-unstyled">
+      {% for img , log_line in log %}
+      <li class="media my-4">
+        <img src={{img}} class="mr-3" style="width:10%" alt="...">
+        <div class="media-body">
+          <h5 class="mt-0 mb-1">{{log_line}}</h5>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
 
+
+    <!-- log -->
 
   </body>
 </html>

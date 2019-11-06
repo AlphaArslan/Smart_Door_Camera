@@ -15,7 +15,7 @@ slash = "\\"         # windows
 
 known_path = "static" + slash + "known_ppl" + slash
 unknown_path = "static" + slash + "unknown_ppl" + slash
-
+log_txt = "static" + slash + "log.txt"
 
 
 ########################## routes
@@ -29,7 +29,23 @@ def strem():
 
 @app.route('/log')
 def log():
-    return render_template("log.html")
+    with open(log_txt, "r") as log:
+        log_lines = log.readlines()
+        log_lines.reverse()
+
+    log = []
+    for line in log_lines:
+        _a = line.split(" ")
+        # known
+        if _a[0] == "Allowed":
+            _img = "static/known_ppl/{}.jpg".format(_a[1])
+        # unknown
+        elif _a[0] == "Rejected":
+            _img = "static/unknown_ppl/{}.jpg".format(_a[1])
+        log.append((_img, line))
+
+
+    return render_template("log.html", log = log)
 
 @app.route('/users')
 def users():
@@ -102,6 +118,15 @@ def add_user(old_name):
     return redirect('/users')
 
 
+@app.route("/controls/<string:control>")
+def controls(control):
+    print(control)
+    if control == "open":
+        print("opened")
+        return "ok"
+    return "not found"
+
+
 ########################## main
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")
