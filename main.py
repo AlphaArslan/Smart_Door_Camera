@@ -24,13 +24,14 @@ socket = context.socket(zmq.REQ)
 socket.connect("tcp://localhost:"+config.MEDIA_PORT)
 
 ################### path
-slash = '\\'                # windows
-# slash = '/'                # linux
+# slash = '\\'                # windows
+slash = '/'                # linux
 
 known_path = "webpage" + slash + "static" + slash + "known_ppl" + slash
 unknown_path = "webpage" + slash + "static" + slash + "unknown_ppl" + slash
-stream_jpg = unknown_path = "webpage" + slash + "static" + slash + "img" + slash + "stream.jpg"
+stream_jpg = "webpage" + slash + "static" + slash + "img" + slash + "stream.jpg"
 log_txt = "webpage" + slash + "static" + slash + "log.txt"
+enc_pickle = "webpage" + slash + "static" + slash + "known_faces_encodings.pickle"
 
 ################### func
 def open_lock():
@@ -42,21 +43,19 @@ def open_lock():
     lock_obj.off()
 
 def get_name_no_ext(str):
-    name = str.split(slash).split(".")[0]
+    name = str.split(slash)[-1].split(".")[0]
     return name
 
 ################### main
 if __name__ == '__main__':
     # setup
+    lock_obj.off()
     unknown_counter = len(glob.glob(unknown_path+'*'))
     allowed = False
     print("[SETUP] proccessing known images encodings")
     known_faces_encodings = []
     known_faces = sorted(glob.glob(known_path+'*'))
     for f in known_faces:
-        # bypass pickle file
-        if f.split(".")[-1] == "pickle":
-            continue
         f_img = face_recognition.load_image_file(f)
         try:
             f_encoding =  face_recognition.face_encodings(f_img)[0]
@@ -66,7 +65,7 @@ if __name__ == '__main__':
         known_faces_encodings.append(f_encoding)
 
     print("[SETUP] saving encodings to file")
-    with open(known_path+"encodings.pickle", 'wb') as fp:
+    with open(enc_pickle, 'wb') as fp:
         pickle.dump(known_faces_encodings, fp)
 
     # loop
@@ -91,20 +90,22 @@ if __name__ == '__main__':
             # send play command
             socket.send(config.MEDIA_CMD_PLAY)
             print(socket.recv())
-            socket.send("voice\\cant_see.m4a".encode('utf-8'))
+            socket.send("voice{}cant_see.m4a".format(slash).encode('utf-8'))
             print(socket.recv())
             # input("press any key to stop media")
-            time.sleep(1)
-            socket.send(config.MEDIA_CMD_STOP)
-            print(socket.recv())
+            # time.sleep(1)
+            # socket.send(config.MEDIA_CMD_STOP)
+            # print(socket.recv())
 
             continue
 
         # check if allowed
         if config.DEBUG_MODE:
             print("[LOOP] Check if allowed")
-        with open (known_path+"encodings.pickle", 'rb') as fp:
+        with open (enc_pickle, 'rb') as fp:
             known_faces_encodings = pickle.load(fp)
+        known_faces = sorted(glob.glob(known_path+'*'))
+
         results = face_recognition.compare_faces(known_faces_encodings, img_encoding)
         i = 0
         for r in results:
@@ -124,12 +125,12 @@ if __name__ == '__main__':
             # send play command
             socket.send(config.MEDIA_CMD_PLAY)
             print(socket.recv())
-            socket.send("voice\\allowed.m4a".encode('utf-8'))
+            socket.send("voice{}allowed.m4a".format(slash).encode('utf-8'))
             print(socket.recv())
             # input("press any key to stop media")
-            time.sleep(1)
-            socket.send(config.MEDIA_CMD_STOP)
-            print(socket.recv())
+            # time.sleep(1)
+            # socket.send(config.MEDIA_CMD_STOP)
+            # print(socket.recv())
 
             # add to log
             name = get_name_no_ext(known_faces[i])
@@ -137,8 +138,8 @@ if __name__ == '__main__':
             txt = "Allowed {} at {}".format(name, now)
             if config.DEBUG_MODE:
                 print("[LOG] {}".format(txt))
-            with open(log_txt, "w+") as log :
-                log.append("{}\n".format(txt))
+            with open(log_txt, "a+") as log :
+                log.write("{}\n".format(txt))
 
             # open lock
             open_lock()
@@ -155,12 +156,12 @@ if __name__ == '__main__':
             # send play command
             socket.send(config.MEDIA_CMD_PLAY)
             print(socket.recv())
-            socket.send("voice\\not_allowed.m4a".encode('utf-8'))
+            socket.send("voice{}not_allowed.m4a".format(slash).encode('utf-8'))
             print(socket.recv())
             # input("press any key to stop media")
-            time.sleep(1)
-            socket.send(config.MEDIA_CMD_STOP)
-            print(socket.recv())
+            # time.sleep(1)
+            # socket.send(config.MEDIA_CMD_STOP)
+            # print(socket.recv())
 
             # add to log
             name = "unknown{}".format(unknown_counter)
@@ -168,13 +169,15 @@ if __name__ == '__main__':
             txt = "Rejected {} at {}".format(name, now)
             if config.DEBUG_MODE:
                 print("[LOG] {}".format(txt))
-            with open(log_txt, "w+") as log :
-                log.append("{}\n".format(txt))
+            with open(log_txt, "a+") as log :
+                log.write("{}\n".format(txt))
 
             # send email
+            if config.DEBUG_MODE:
+                print("[LOOP] Sending Email Alarm")
             send_email.send_default_msg()
 
             # save image
+            if config.DEBUG_MODE:
+                print("[LOOP] Saving Images")
             cv2.imwrite(unknown_path+"unknown{}.jpg".format(unknown_counter), img)
-            # update stream.jpg
-            cv2.imwrite(stream_jpg, img)
