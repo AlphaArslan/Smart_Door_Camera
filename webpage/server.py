@@ -23,7 +23,7 @@ slash = "/"          # linux
 known_path = "static" + slash + "known_ppl" + slash
 unknown_path = "static" + slash + "unknown_ppl" + slash
 log_txt = "static" + slash + "log.txt"
-enc_pickle = "webpage" + slash + "static" + slash + "known_faces_encodings.pickle"
+enc_pickle = "static" + slash + "known_faces_encodings.pickle"
 
 
 ########################## routes
@@ -105,7 +105,7 @@ def remove(k, name):
                 quit()
             known_faces_encodings.append(f_encoding)
         print("saving encodings to file")
-        with open(enc_pickle, 'wb') as fp:
+        with open(enc_pickle, 'wb+') as fp:
             pickle.dump(known_faces_encodings, fp)
 
     elif k == 'unknown':
@@ -132,7 +132,7 @@ def add_user(old_name):
         known_faces_encodings.append(f_encoding)
 
     print("saving encodings to file")
-    with open(enc_pickle, 'wb') as fp:
+    with open(enc_pickle, 'wb+') as fp:
         pickle.dump(known_faces_encodings, fp)
 
     return redirect('/users')

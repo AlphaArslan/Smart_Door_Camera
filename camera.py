@@ -2,12 +2,14 @@
 import cv2
 import config
 
+
 class Camera():
     def __init__(self, id):
         """
         microsoft live hd-3000 camera
         """
         self.cam = cv2.VideoCapture(id)
+        self.cam.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
     def get_image(self):
         ret, img = self.cam.read()
