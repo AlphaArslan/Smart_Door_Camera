@@ -17,3 +17,6 @@ MEDIA_CMD_PLAY      =       b'play'
 MEDIA_CMD_STOP      =       b'stop'
 MEDIA_CMD_TERMINATE =       b'terminate'
 MEDIA_PORT          =       "4456"
+
+########################### tolerance
+FACE_TOLERANCE      =       0.6             # 0.6 default .. less is more strict

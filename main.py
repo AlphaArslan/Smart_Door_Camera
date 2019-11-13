@@ -106,7 +106,7 @@ if __name__ == '__main__':
             known_faces_encodings = pickle.load(fp)
         known_faces = sorted(glob.glob(known_path+'*'))
 
-        results = face_recognition.compare_faces(known_faces_encodings, img_encoding)
+        results = face_recognition.compare_faces(known_faces_encodings, img_encoding, tolerance=config.FACE_TOLERANCE)
         i = 0
         for r in results:
             if r :
