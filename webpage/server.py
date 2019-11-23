@@ -1,3 +1,8 @@
+############ Logging
+import sys
+f = open('../log/server_log.txt', 'w+')
+sys.stdout = f
+
 ########################## import
 from flask import Flask, render_template, redirect, request
 import glob

@@ -1,3 +1,9 @@
+############ Logging
+import sys
+f = open('log/media_log.txt', 'w+')
+sys.stdout = f
+
+
 import vlc
 import time
 import zmq

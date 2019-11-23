@@ -1,3 +1,8 @@
+############ Logging
+import sys
+f = open('log/main_log.txt', 'w+')
+sys.stdout = f
+
 ################### Import
 import time
 import face_recognition
