@@ -19,4 +19,4 @@ MEDIA_CMD_TERMINATE =       b'terminate'
 MEDIA_PORT          =       "4456"
 
 ########################### tolerance
-FACE_TOLERANCE      =       0.6             # 0.6 default .. less is more strict
+FACE_TOLERANCE      =       0.5             # 0.6 default .. less is more strict
